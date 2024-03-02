@@ -1,4 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('productos')
 export class Product {
@@ -37,4 +46,14 @@ export class Product {
     comment: 'Descripcion del producto',
   })
   fecha_modificacion: Date;
+
+  @BeforeInsert()
+  setDates() {
+    this.fecha_creacion = new Date();
+  }
+
+  //Relacion muchos a uno con la tabla usuarios
+  @ManyToOne(() => User, (user) => user.products)
+  @JoinColumn({ name: 'creado_por' })
+  user: User;
 }

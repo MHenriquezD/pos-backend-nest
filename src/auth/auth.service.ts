@@ -1,26 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { LoginUserDto } from './dto/login-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+
+import { User } from 'src/users/entities/user.entity';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+  constructor(
+    @InjectRepository(User)
+    private _userRepo: Repository<User>,
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+    private readonly _jwtService: JwtService,
+  ) {}
+  async create(loginUserDto: LoginUserDto) {
+    const { correo, contrasena } = loginUserDto;
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    const user = await this._userRepo.findOneBy({
+      correo,
+      activo: true,
+    });
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    if (!user) {
+      throw new UnauthorizedException('Credenciales no válidas');
+    }
+    if (!bcrypt.compareSync(contrasena, user.contrasena)) {
+      throw new UnauthorizedException('Credenciales no válidas');
+    }
+    const payload: JwtPayload = {
+      identidad: user.identidad,
+      correo: user.correo,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      activo: user.activo,
+    };
+    return {
+      token: this._jwtService.sign(payload),
+    };
   }
 }
