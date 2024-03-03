@@ -13,14 +13,28 @@ import {
 @Entity('usuarios')
 export class User {
   @ApiProperty({
-    example: '1234567890123',
-    description: 'Identidad del usuario',
+    example: 'example@example.com',
+    description: 'Correo del usuario',
     required: true,
   })
   @PrimaryColumn('char', {
-    length: 13,
+    type: 'varchar',
+    length: 100,
     nullable: false,
     unique: true,
+  })
+  correo: string;
+
+  @Column({
+    type: 'varchar',
+    length: 100,
+    nullable: false,
+    unique: true,
+  })
+  @ApiProperty({
+    example: '1234567890123',
+    description: 'Identidad del usuario',
+    required: true,
   })
   identidad: string;
 
@@ -47,19 +61,6 @@ export class User {
     nullable: false,
   })
   apellido: string;
-
-  @ApiProperty({
-    example: 'example@example.com',
-    description: 'Correo del usuario',
-    required: true,
-  })
-  @Column({
-    type: 'varchar',
-    length: 100,
-    nullable: false,
-    unique: true,
-  })
-  correo: string;
 
   @ApiProperty({
     example: 'Password123',
