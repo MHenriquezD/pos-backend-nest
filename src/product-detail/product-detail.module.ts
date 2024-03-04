@@ -4,10 +4,13 @@ import { ProductDetailController } from './product-detail.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProductDetail } from './entities/product-detail.entity';
+import { Product } from '../products/entities/product.entity';
+import { ConfigService } from '@nestjs/config';
+import { Files } from '../files/entities/file.entity';
 
 @Module({
   controllers: [ProductDetailController],
-  providers: [ProductDetailService],
-  imports: [TypeOrmModule.forFeature([ProductDetail])],
+  providers: [ProductDetailService, ConfigService],
+  imports: [TypeOrmModule.forFeature([ProductDetail, Product, Files])],
 })
 export class ProductDetailModule {}

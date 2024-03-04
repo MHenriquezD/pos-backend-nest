@@ -46,8 +46,8 @@ export class ProductsService {
       .where(search ? 'product.nombre ILIKE :search' : '1=1', {
         search: `%${search}%`,
       })
-      .andWhere('product.creado_por = :user', { user })
-      .orderBy('product.fecha_creacion', 'DESC')
+      .andWhere('(product.creado_por = :user AND visible = true)', { user })
+      .orderBy('product.fecha_creacion')
       .take(itemsPerPage)
       .skip((currentPage - 1) * itemsPerPage);
     if (childs) {
@@ -69,8 +69,8 @@ export class ProductsService {
     };
   }
 
-  findOne(id: string, user: string) {
-    return this._productRepo.findOneBy({ id, creado_por: user });
+  async findOne(id: string, user: string) {
+    return await this._productRepo.findOneBy({ id, creado_por: user });
   }
 
   async update(id: string, updateProductDto: UpdateProductDto, user: string) {
