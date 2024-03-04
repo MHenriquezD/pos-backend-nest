@@ -128,7 +128,7 @@ export class ProductDetail {
   product: Product;
 
   // Relacion 1:1 con la tabla archivos
-  @OneToOne(() => Files)
-  @JoinColumn({ name: 'imagen' })
-  image: File;
+  // @OneToOne(() => Files)
+  // @JoinColumn({ name: 'imagen' })
+  // image: File;
 }
