@@ -94,10 +94,11 @@ export class FilesService {
         if (fileUpdated.affected === 0) {
           this.deleteImage(filename);
           throw new BadRequestException('No se ha podido actualizar la imagen');
-        } else this.deleteImage(nombre_completo);
+        } else {
+          this.deleteImage(nombre_completo);
+        }
 
-        if (!fileCreated)
-          throw new BadRequestException('No se ha podido crear la imagen');
+        if (!fileCreated) fileCreated = fileUpload;
         try {
           // ... code to update the productDetail
           const updatedImage = await this._productDetailRepo.update(
