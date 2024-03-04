@@ -5,22 +5,34 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+  Res,
 } from '@nestjs/common';
 import { ProductDetailService } from './product-detail.service';
+import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
+
 import { CreateProductDetailDto } from './dto/create-product-detail.dto';
 import { UpdateProductDetailDto } from './dto/update-product-detail.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProductDetail } from './entities/product-detail.entity';
-import { AuthGuard } from '@nestjs/passport';
+import { fileFilter, fileNamer } from '../helpers/files/index';
+import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('product-detail')
 @ApiTags('Detalle de productos')
 export class ProductDetailController {
-  constructor(private readonly productDetailService: ProductDetailService) {}
+  constructor(
+    private readonly productDetailService: ProductDetailService,
+    private readonly _configService: ConfigService,
+  ) {}
 
   @Post()
   @ApiResponse({
@@ -66,8 +78,8 @@ export class ProductDetailController {
     status: 404,
     description: 'Detalle de producto no encontrado',
   })
-  findOne(@Param('id') id: string) {
-    return this.productDetailService.findOne(+id);
+  findOne(@Param('id') id: string, @Req() req: any) {
+    return this.productDetailService.findOne(id, req.user.correo);
   }
 
   @Patch(':id')
@@ -83,20 +95,12 @@ export class ProductDetailController {
   update(
     @Param('id') id: string,
     @Body() updateProductDetailDto: UpdateProductDetailDto,
+    @Req() req: any,
   ) {
-    return this.productDetailService.update(+id, updateProductDetailDto);
-  }
-
-  @Delete(':id')
-  @ApiResponse({
-    status: 200,
-    description: 'Detalle de producto eliminado',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Detalle de producto no encontrado',
-  })
-  remove(@Param('id') id: string) {
-    return this.productDetailService.remove(+id);
+    return this.productDetailService.update(
+      id,
+      updateProductDetailDto,
+      req.user.correo,
+    );
   }
 }

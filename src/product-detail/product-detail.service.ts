@@ -2,19 +2,29 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { validate as isUUID } from 'uuid';
+
 import { CreateProductDetailDto } from './dto/create-product-detail.dto';
 import { UpdateProductDetailDto } from './dto/update-product-detail.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ProductDetail } from './entities/product-detail.entity';
-import { Repository } from 'typeorm';
-import { IsUUID } from 'class-validator';
+import { Product } from '../products/entities/product.entity';
+import { Files } from '../files/entities/file.entity';
 
 @Injectable()
 export class ProductDetailService {
   constructor(
     @InjectRepository(ProductDetail)
     private _productDetailRepo: Repository<ProductDetail>,
+
+    @InjectRepository(Product)
+    private _productRepo: Repository<Product>,
+
+    @InjectRepository(Files)
+    private _filesRepo: Repository<Files>,
   ) {}
   create(createProductDetailDto: CreateProductDetailDto, correo: string) {
     try {
@@ -33,16 +43,47 @@ export class ProductDetailService {
     return await this._productDetailRepo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} productDetail`;
+  async findOne(id: string, correo: string) {
+    if (!isUUID(id)) throw new BadRequestException('El id no es válido');
+    const productDetail = await this._productDetailRepo.findOneBy({
+      id,
+      creado_por: correo,
+    });
+    if (!productDetail)
+      throw new BadRequestException('Detalle de producto no encontrado');
+    const images = await this._filesRepo.findOneBy({ id_detalle_producto: id });
+    return { ...productDetail, url: images?.url };
   }
 
-  update(id: number, updateProductDetailDto: UpdateProductDetailDto) {
-    return `This action updates a #${id} productDetail`;
-  }
+  async update(
+    id: string,
+    { imagen, ...updateProduct }: UpdateProductDetailDto,
+    correo: string,
+  ) {
+    if (!isUUID(id)) throw new BadRequestException('El id no es UUID válido');
+    try {
+      const productDetail = await this._productDetailRepo.findOneBy({
+        id,
+        creado_por: correo,
+      });
+      if (!productDetail)
+        throw new UnauthorizedException(
+          'No tienes permiso para modificar este detalle de producto',
+        );
 
-  remove(id: number) {
-    return `This action removes a #${id} productDetail`;
+      const updatedProductDetail = await this._productDetailRepo.update(
+        { id, creado_por: correo },
+        updateProduct,
+      );
+      if (!updatedProductDetail.affected)
+        throw new InternalServerErrorException(
+          'No se pudo actualizar el producto',
+        );
+
+      return await this._productDetailRepo.findOneBy({ id });
+    } catch (error) {
+      this.handleDBErrors(error);
+    }
   }
 
   private handleDBErrors(error: any): never {

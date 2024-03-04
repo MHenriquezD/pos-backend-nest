@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Product } from 'src/products/entities/product.entity';
 import {
   BeforeInsert,
   Column,
@@ -8,6 +7,9 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
+import { Product } from 'src/products/entities/product.entity';
+import { Files } from 'src/files/entities/file.entity';
 
 @Entity('detalle_producto')
 export class ProductDetail {
@@ -59,7 +61,6 @@ export class ProductDetail {
 
   @Column({
     type: 'varchar',
-    length: 255,
     nullable: true,
     comment: 'Imagen del producto',
   })
@@ -125,4 +126,9 @@ export class ProductDetail {
   @OneToOne(() => Product)
   @JoinColumn({ name: 'id_producto' })
   product: Product;
+
+  // Relacion 1:1 con la tabla archivos
+  // @OneToOne(() => Files)
+  // @JoinColumn({ name: 'imagen' })
+  // image: File;
 }
