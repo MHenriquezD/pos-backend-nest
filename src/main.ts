@@ -18,7 +18,7 @@ async function bootstrap() {
   app.enableCors();
   app.setGlobalPrefix('api');
 
-  const logger = new Logger('bootstrap');
+  const logger = new Logger('NestApplication');
 
   const config = new DocumentBuilder()
     .setTitle('Pos API')
@@ -29,7 +29,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT || 3500);
+  await app.listen(process.env.PORT || 3000);
   logger.log(`Application listening on port ${process.env.PORT || 3500}`);
 }
 bootstrap();
