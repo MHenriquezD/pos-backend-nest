@@ -88,7 +88,11 @@ export class ClientsService {
       });
       if (!cliente) throw new BadRequestException('El cliente no existe');
 
-      Object.assign(cliente, { eliminado: true });
+      Object.assign(cliente, {
+        eliminado: true,
+        fecha_eliminacion: new Date(),
+        eliminado_por: correo,
+      });
       const { eliminado } = await this._clientRepo.save(cliente);
       if (!eliminado) throw new InternalServerErrorException();
       return {
