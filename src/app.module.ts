@@ -9,6 +9,9 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { FilesModule } from './files/files.module';
 import { ClientsModule } from './clients/clients.module';
+import { CompanyModule } from './company/company.module';
+import { CompanyDetailModule } from './company-detail/company-detail.module';
+import { CompanyCaiModule } from './company-cai/company-cai.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { ClientsModule } from './clients/clients.module';
     UsersModule,
     FilesModule,
     ClientsModule,
+    CompanyModule,
+    CompanyDetailModule,
+    CompanyCaiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
