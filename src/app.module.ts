@@ -9,6 +9,9 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { FilesModule } from './files/files.module';
 import { ClientsModule } from './clients/clients.module';
+import { CompanyModule } from './company/company.module';
+import { CompanyDetailModule } from './company-detail/company-detail.module';
+import { CompanyCaiModule } from './company-cai/company-cai.module';
 
 @Module({
   imports: [
@@ -20,6 +23,7 @@ import { ClientsModule } from './clients/clients.module';
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
+      schema: process.env.DB_SCHEMA,
       autoLoadEntities: true,
       synchronize: true,
     }),
@@ -29,6 +33,9 @@ import { ClientsModule } from './clients/clients.module';
     UsersModule,
     FilesModule,
     ClientsModule,
+    CompanyModule,
+    CompanyDetailModule,
+    CompanyCaiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
