@@ -108,6 +108,17 @@ export class User {
   })
   fecha_actualizacion: Date;
 
+  @ApiProperty({
+    example: '2021-10-10 10:00:00',
+    description: 'Fecha de actualización del usuario',
+    required: false,
+  })
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  fecha_eliminacion: Date;
+
   @BeforeInsert()
   setDefaultDates() {
     this.fecha_creacion = new Date();
